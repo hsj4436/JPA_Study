@@ -17,16 +17,13 @@ public class JpaMain {
         tx.begin();
 
         try {
-            // 영속
-            Member findMember = em.find(Member.class, 4L);
-            findMember.setName("B");
+            Member member=  new Member();
+            member.setId(1L);
+            member.setUsername("A");
+            member.setRoleType(RoleType.USER);
 
-            // 준영속
-            em.detach(findMember);
+            em.persist(member);
 
-            System.out.println("=====================");
-
-            // 실제 insert query 나가는 시점
             tx.commit();
         } catch (Exception e) {
             tx.rollback();

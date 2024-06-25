@@ -186,3 +186,81 @@ JPA를 이해하는데 가장 중요한 용어
     - FlushModeType.COMMIT : 커밋할 때만 플러시  
 
 지연 로딩(Lazy Loading)    
+
+
+## 엔티티 매핑  
+
+---  
+### DB 스키마 자동 생성  
+DDL을 애플리케이션 실행 시점에 자동 생성  
+DB Dialect를 사용해 DB에 맞는 적절한 DDL 생성  
+
+hibernate.hbm2ddl.auto 속성
+
+|      옵션      | 설명                               |  
+|:------------:|:---------------------------------|  
+|    create    | 기존 테이블 삭제 후 다시 생성(DROP > CREATE) |  
+| create-drop  | create와 같으나 종료시점에 테이블 DROP       |  
+|    update    | 변경분만 반영(운영DB에는 사용하면 안됨)          |  
+|   validate   | 엔티티와 테이블이 정상 매핑되었는지 확인           | 
+|     none     | 사용하지 않음                          |  
+
+주의점  
+- 운영 장비에는 절대 create, create-drop, update 사용 X  
+  - 운영 DB를 날리거나 말아먹는 방법이라 그런듯  
+- 개발 초기 단계는 create 또는 update  
+- 테스트 서버는 update 또는 validate  
+- 스테이징과 운영 서버는 validate 또는 none  
+
+듣고 나서 생각해보니 혼자 개발할 때, 개발 완전 초기 단계가 아닌 이상 자동 생성 옵션 자체를 안 쓰는게 나을 것 같다.   
+
+
+### DDL 생성 기능  
+@Column, @Table 어노테이션을 이용해서 제약조건을 추가하는 경우  
+DDL 생성 기능은 DDL을 자동 생성할 때만 사용되고, JPA의 실행 로직에는 영향을 주지 않는다.  
+
+
+### 객체와 테이블 매핑  
+@Entity  
+- @Entity가 붙은 클래스를 JPA가 관리
+- JPA를 사용해서 테이블과 매핑할 클래스는 @Entity 필수  
+- 주의
+  - 기본 생성자 필수(파라미터 없는 public 또는 protected 생성자)
+  - final 클래스, enum, interface, inner 클래스 사용 X  
+  - 저장할 필드에 final 사용 X  
+- 속성 : name  
+  - JPA에서 사용할 엔티티 이름을 지정  
+  - 기본값: 클래스 이름을 그대로 사용  
+  - 같은 클래스 이름이 없으면 가급적 기본값 사용  
+
+@Table  
+- 엔티티와 매핑할 테이블 지정  
+
+### 필드와 컬럼 매핑  
+@Column  
+- name 속성을 이용해 실제 DB에 사용되는 칼럼명을 지정할 수 있다.  
+- insertable, updatable을 통해 등록, 변경 가능 여부를 지정할 수 있다.  
+- nullable(DDL)를 false로 하면 DDL 생성 시 not null 제약조건이 붙는다.  
+- unique(DDL), @Table의 uniqueConstraints와 같지만 한 칼럼에 간단히 제약조건 걸 때 사용한다.  
+- columnDefinition(DDL), length(DDL), precision(DDL), scale(DDL)  
+
+@Enumerated  
+- Enum 타입 매핑  
+- 속성값으로 ORDINAL(default)를 사용할 경우 enum 순서를 DB에 저장하니 주의해야 한다.  
+- 속성값으로 STRING를 사용할 경우 enum 이름을 DB에 저장한다.  
+
+@Temporal  
+- 날짜 타입 매핑  
+- LocalDate, LocalDateTime을 사용할 때는 생략 가능  
+
+@Transient  
+- 특정 필드를 컬럼에 매핑하지 않음  
+- DB에 저장 X, 조회 X  
+- 주로 메모리상에서만 임시로 값을 보관하고 싶을 때 사용  
+
+### 기본 키 매핑  
+@Id  
+
+### 연관관계 매핑  
+@ManyToOne, @JoinColumn  
+
