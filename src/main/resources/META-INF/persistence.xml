@@ -8,7 +8,7 @@
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
             <property name="jakarta.persistence.jdbc.user" value="sa"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/test"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/jpashop"/>
             <!-- Dialect - 사용하는 DB 벤더에 맞춰 SQL을 생성하기 위한 정보, Hibernate는 40가지 이상 지원 -->
             <!-- MySQL에서는 LIMIT이지만, Oracle에서는 ROWNUM 이듯 다른 부분들을 커버하기 위함 -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
@@ -17,7 +17,7 @@
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments"  value="true"/>
-            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="hibernate.hbm2ddl.auto" value="create" />
         </properties>
     </persistence-unit>
 

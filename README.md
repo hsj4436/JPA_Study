@@ -259,7 +259,31 @@ DDL 생성 기능은 DDL을 자동 생성할 때만 사용되고, JPA의 실행 
 - 주로 메모리상에서만 임시로 값을 보관하고 싶을 때 사용  
 
 ### 기본 키 매핑  
-@Id  
+직접 할당할 경우, @Id만 사용  
+
+@GeneratedValue(자동 생성)  
+- IDENTITY  
+  - DB에 위임  
+  - MySQL(AUTO_INCREMENT)  
+  - JPA는 보통 트랜잭션 커밋 시점에 INSERT SQL 실행  
+  - AUTO_INCREMENT는 DB에 INSERT SQL을 실행한 후에 ID 값을 알 수 있음  
+  - 영속성 컨텍스트에서 관리하기 위해선 PK(ID)가 필요한데, IDENTITY 전략의 경우 INSERT 쿼리가 실행되어야 알 수 있음  
+  - 그래서 예외적으로 entityManager.persist()가 호출되는 순간 INSERT 쿼리를 날리고, ID를 받아옴  
+- SEQUENCE : DB 시퀀스 오브젝트 사용, ORACLE
+  - @SequenceGenerator  
+    - name : 식별자 생성기 이름
+    - sequenceName : DB에 등록되어 있는 시퀀스 이름  
+    - initialValue : DDL 생성 시에만 사용  
+    - allocationSize : 시퀀스 한번 호출에 증가하는 수(default : 50)  
+      - 기본값 50 사용할 경우, 시퀀스 한번 호출시 DB에 50만큼 증가시켜두고, 애플리케이션 메모리상에서 증분만큼 사용  
+- TABLE : 키 생성용 테이블 사용, 모든 DB에서 사용  
+- AUTO : Dialect에 따라 자동 지정, 기본값  
+
+권장하는 식별자 전략  
+- 기본키 제약 조건 : NOT NULL, 유일, 변하면 안된다.  
+- 미래까지 이 조건을 만족하는 자연키는 찾기 어렵다. 대리키(대체키)를 사용하자.  
+- 권장 : Long + 대체키 + 키 생성전략 사용  
+
 
 ### 연관관계 매핑  
 @ManyToOne, @JoinColumn  
