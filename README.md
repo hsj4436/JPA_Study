@@ -285,6 +285,70 @@ DDL 생성 기능은 DDL을 자동 생성할 때만 사용되고, JPA의 실행 
 - 권장 : Long + 대체키 + 키 생성전략 사용  
 
 
-### 연관관계 매핑  
-@ManyToOne, @JoinColumn  
+## 연관관계 매핑  
+
+---  
+### 단방향 매핑  
+![UnidirectionalMapping](/images/unidirectionalMapping.png)  
+
+<br>
+
+### 양방향 연관관계  
+양방향 매핑  
+![BidirectionalMapping](/images/bidirectionalMapping.png)  
+
+양방향 매핑을 하더라도, DB테이블은 단방향일때와 같다.  
+DB테이블 입장에서는 외래키만 있으면 양방향으로 다 갈 수 있기 때문, 사실상 방향이 필요없다.  
+단방향 매핑으로도 이미 연관관계 매핑은 됐지만, 양방향 매핑을 통해 반대 방향으로 조회(객체 그래프 담색) 기능이 추가되는 것  
+단방향 매핑을 잘 하고, DB테이블에 영향을 주지 않기 때문에 양방향은 필요할 때 추가해도 된다.  
+
+<br>
+
+### 연관관계의 주인과 mappedBy  
+객체와 테이블간에 연관관계를 맺는 차이를 이해해야 한다.  
+- e.g. 객체 연관관계 = 2개  
+  - 회원 -> 팀 (연관관계 1개, 단방향)  
+  - 팀 -> 회원 (연관관계 1개, 단방향)  
+- 위 예를 테이블 연관관계로 풀어내면 1개  
+  - 회원 <-> 팀 (연관관계 1개, 양방향)  
+
+객체의 양방향 관계는 사실 양방향 관계가 아니라, 서로 다른 단방향 관계 2개다.  
+반면 테이블의 양방향 관계는 외래키 하나로 끝이난다.  
+
+그렇기에 객체의 양방향 관계를 만들고자 한다면, 둘 중 하나로 외래키를 관리(연관관계의 주인)해야 한다.  
+
+**양방향 매핑 규칙**  
+- 외래키가 있는 곳을 주인으로 지정  
+- 연관관계의 주인만이 외래키를 관리(등록, 수정)  
+- 주인이 아닌쪽은 읽기만 가능  
+- 주인은 mappedBy 속성 사용 X  
+- 주인이 아니면, mappedBy 속성으로 주인 지정  
+
+<br>
+
+연관관계 편의 메소드  
+```java
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+public class Member {
+  private Long id;
+  private String name;
+  @ManyToOne
+  @JoinColumn(name = "TEAM_ID")
+  private Team team;
+  
+  // ...
+  public void setTeam(Team team) {
+    this.team = team;
+    // 반대쪽 연관관계에도 값을 넣어 양쪽에서 조회할 수 있도록
+    team.getMembers().add(this);
+  }
+}
+```  
+
+<br>  
+
+양방향 매핑시에 무한 루프를 조심하자.  
+- toString(), lombok, JSON 생성 라이브러리  
 
